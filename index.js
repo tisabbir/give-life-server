@@ -25,7 +25,6 @@ const client = new MongoClient(uri, {
 
 const userCollection = client.db("giveLifeDB").collection("userCollection");
 
-
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -33,22 +32,39 @@ async function run() {
 
     //User Related API
 
-    app.get('/users/:email', async(req,res)=>{
-        const query = {email : req.params.email}
-        const result = await userCollection.findOne(query);
-        res.send(result);
-    })
+    app.get("/users/:email", async (req, res) => {
+      const query = { email: req.params.email };
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    });
 
     app.post("/users", async (req, res) => {
       //TODO: get the user
       const user = req.body;
       const query = { email: user.email };
       const existingUser = await userCollection.findOne(query);
-      if(existingUser){
-        return res.send({message : 'User already exists', insertedId : null})
+      if (existingUser) {
+        return res.send({ message: "User already exists", insertedId: null });
       }
       const result = await userCollection.insertOne(user);
-      res.send(result)
+      res.send(result);
+    });
+
+    app.patch("/users/:email", async (req, res) => {
+      const updatedUser = req.body;
+      const email = req.params.email;
+      const filter = { email: email };
+      const updatedDoc = {
+        $set: {
+          name: updatedUser.updatedName,
+          avatarUrl: updatedUser.updatedPhoto,
+          district: updatedUser.updatedDistrict,
+          upozila: updatedUser.updatedUpozila,
+          blood: updatedUser.updatedBlood,
+        },
+      };
+      const result = await userCollection.updateOne(filter, updatedDoc)
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
