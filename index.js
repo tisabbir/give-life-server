@@ -24,6 +24,7 @@ const client = new MongoClient(uri, {
 });
 
 const userCollection = client.db("giveLifeDB").collection("userCollection");
+const donationRequestCollection = client.db("giveLifeDB").collection("donationRequestCollection");
 
 async function run() {
   try {
@@ -66,6 +67,21 @@ async function run() {
       const result = await userCollection.updateOne(filter, updatedDoc)
       res.send(result);
     });
+
+
+    //donation request related api
+
+    app.get('/donationRequests', async(req, res) => {
+        const result = await donationRequestCollection.find().toArray();
+        res.send(result)
+    })
+
+    app.post('/donationRequests', async(req, res) => {
+        const donationRequest = req.body;
+        const result = await donationRequestCollection.insertOne(donationRequest);
+        res.send(result);
+
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
