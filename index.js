@@ -76,6 +76,13 @@ async function run() {
         res.send(result)
     })
 
+    app.get('/donationRequests/:email', async(req,res)=>{
+        const email = req.params.email;
+        const query = {requesterEmail : email};
+        const result = await donationRequestCollection.find(query).toArray();
+        res.send(result);
+    })
+
     app.post('/donationRequests', async(req, res) => {
         const donationRequest = req.body;
         const result = await donationRequestCollection.insertOne(donationRequest);
