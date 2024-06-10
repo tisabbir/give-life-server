@@ -109,6 +109,13 @@ async function run() {
         const updatedDoc = {
             $set:{
                 donationStatus : updatedRequest.donationStatus,
+                recipientName : updatedRequest.recipientName,
+                recipientDistrict : updatedRequest.recipientDistrict,
+                recipientUpozila : updatedRequest.recipientUpozila,
+                hospital : updatedRequest.hospital,
+                address : updatedRequest.address,
+                donationDateAndTime : updatedRequest.donationDateAndTime,
+                requestMessage : updatedRequest.requestMessage,
             }
         }
         const result = await donationRequestCollection.updateOne(filter,updatedDoc);
