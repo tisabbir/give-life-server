@@ -122,6 +122,19 @@ async function run() {
         res.send(result);
     })
 
+    app.patch('/requests/:id', async(req,res)=>{
+        const id = req.params.id;
+        const updatedRequest = req.body;
+        const filter = {_id : new ObjectId(id)};
+        const updatedDoc = {
+            $set:{
+                donationStatus : updatedRequest.donationStatus,
+            }
+        }
+        const result = await donationRequestCollection.updateOne(filter,updatedDoc);
+        res.send(result);
+    })
+
     app.delete('/donationRequests/:id', async(req, res)=> {
         const id = req.params.id;
         const query = {_id : new ObjectId(id)};
