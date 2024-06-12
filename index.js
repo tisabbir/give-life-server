@@ -11,7 +11,13 @@ const app = express();
 //define port address
 const port = process.env.PORT || 5000;
 // use the middle wires
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "give-life-bd037.web.app",
+    "give-life-bd037.firebaseapp.com",
+  ],
+}));
 app.use(express.json());
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
@@ -62,7 +68,7 @@ const verifyAdmin = async (req, res, next) => {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     //JWT related api's
     app.post('/jwt', async(req,res)=>{
@@ -177,6 +183,8 @@ async function run() {
         const result = await donationRequestCollection.find().toArray();
         res.send(result)
     })
+
+
     app.get('/pendingDonationRequests', async(req, res) => {
         const query = {donationStatus : 'pending'}
         const result = await donationRequestCollection.find(query).toArray();
@@ -297,7 +305,7 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
