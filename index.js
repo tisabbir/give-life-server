@@ -33,6 +33,11 @@ async function run() {
 
     //User Related API
 
+    app.get('/users', async(req,res)=>{
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    })
+
     app.get("/users/:email", async (req, res) => {
       const query = { email: req.params.email };
       const result = await userCollection.findOne(query);
@@ -62,6 +67,22 @@ async function run() {
           district: updatedUser.updatedDistrict,
           upozila: updatedUser.updatedUpozila,
           blood: updatedUser.updatedBlood,
+        },
+      };
+      const result = await userCollection.updateOne(filter, updatedDoc)
+      res.send(result);
+    });
+
+    //users is now considered as members, for avoiding the problem related ot undefined and missing key in updatedDoc. I will update it letter and will follow the DRY principle. 
+
+    app.patch("/members/:email", async (req, res) => {
+      const updatedUser = req.body;
+      const email = req.params.email;
+      const filter = { email: email };
+      const updatedDoc = {
+        $set: {
+          status : updatedUser.status,
+          role : updatedUser.role,
         },
       };
       const result = await userCollection.updateOne(filter, updatedDoc)
