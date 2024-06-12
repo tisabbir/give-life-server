@@ -104,6 +104,27 @@ async function run() {
       res.send({ admin });
     });
 
+
+    //check if the user is volunteer or not
+    app.get("/users/volunteer/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: "unauthorized access" });
+      }
+
+      //if the user owns the token then get the user data from database
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      //now check if the user is admin or not
+      let volunteer = false;
+      if (user) {
+        volunteer = user?.role === "volunteer";
+      }
+      //send the state of being admin true or false
+      res.send({ volunteer });
+    });
+
     app.post("/users", async (req, res) => {
       //TODO: get the user
       const user = req.body;
@@ -116,7 +137,7 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/users/:email", async (req, res) => {
+    app.patch("/users/:email",verifyToken, async (req, res) => {
       const updatedUser = req.body;
       const email = req.params.email;
       const filter = { email: email };
@@ -135,7 +156,7 @@ async function run() {
 
     //users is now considered as members, for avoiding the problem related ot undefined and missing key in updatedDoc. I will update it letter and will follow the DRY principle. 
 
-    app.patch("/members/:email", async (req, res) => {
+    app.patch("/members/:email",verifyToken, async (req, res) => {
       const updatedUser = req.body;
       const email = req.params.email;
       const filter = { email: email };
@@ -164,7 +185,7 @@ async function run() {
 
     
 
-    app.get('/donationRequests/:email', async(req,res)=>{
+    app.get('/donationRequests/:email',verifyToken, async(req,res)=>{
         const email = req.params.email;
         const query = {requesterEmail : email};
         const result = await donationRequestCollection.find(query).toArray();
@@ -181,14 +202,14 @@ async function run() {
 
 
 
-    app.post('/donationRequests', async(req, res) => {
+    app.post('/donationRequests',verifyToken, async(req, res) => {
         const donationRequest = req.body;
         const result = await donationRequestCollection.insertOne(donationRequest);
         res.send(result);
 
     })
 
-    app.patch('/donationRequests/:id', async(req,res)=>{
+    app.patch('/donationRequests/:id',verifyToken, async(req,res)=>{
         const id = req.params.id;
         const updatedRequest = req.body;
         const filter = {_id : new ObjectId(id)};
@@ -208,7 +229,7 @@ async function run() {
         res.send(result);
     })
 
-    app.patch('/requests/:id', async(req,res)=>{
+    app.patch('/requests/:id',verifyToken, async(req,res)=>{
         const id = req.params.id;
         const updatedRequest = req.body;
         const filter = {_id : new ObjectId(id)};
@@ -221,7 +242,7 @@ async function run() {
         res.send(result);
     })
 
-    app.delete('/donationRequests/:id', async(req, res)=> {
+    app.delete('/donationRequests/:id',verifyToken, async(req, res)=> {
         const id = req.params.id;
         const query = {_id : new ObjectId(id)};
         const result = await donationRequestCollection.deleteOne(query);
@@ -248,13 +269,13 @@ async function run() {
   })
     
 
-    app.post('/blogs', async(req,res)=>{
+    app.post('/blogs',verifyToken, async(req,res)=>{
       const blog = req.body;
       const result = await blogCollection.insertOne(blog);
       res.send(result);
     })
 
-    app.patch('/blogs/:id', async(req,res)=>{
+    app.patch('/blogs/:id',verifyToken, async(req,res)=>{
       const id = req.params.id;
       const updatedBlog = req.body;
       const filter = {_id : new ObjectId(id)};
@@ -267,7 +288,7 @@ async function run() {
       res.send(result);
   })
 
-  app.delete('/blogs/:id', async(req, res)=> {
+  app.delete('/blogs/:id',verifyToken, async(req, res)=> {
     const id = req.params.id;
     const query = {_id : new ObjectId(id)};
     const result = await blogCollection.deleteOne(query);
