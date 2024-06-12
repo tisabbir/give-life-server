@@ -97,6 +97,11 @@ async function run() {
         const result = await donationRequestCollection.find().toArray();
         res.send(result)
     })
+    app.get('/pendingDonationRequests', async(req, res) => {
+        const query = {donationStatus : 'pending'}
+        const result = await donationRequestCollection.find(query).toArray();
+        res.send(result)
+    })
 
     
 
