@@ -24,6 +24,7 @@ const client = new MongoClient(uri, {
 });
 
 const userCollection = client.db("giveLifeDB").collection("userCollection");
+const blogCollection = client.db("giveLifeDB").collection("blogCollection");
 const donationRequestCollection = client.db("giveLifeDB").collection("donationRequestCollection");
 
 async function run() {
@@ -162,6 +163,32 @@ async function run() {
         const result = await donationRequestCollection.deleteOne(query);
         res.send(result);
     })
+
+    //blog Related API
+    app.get('/blogs', async(req, res)=>{
+      const result = await blogCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.post('/blogs', async(req,res)=>{
+      const blog = req.body;
+      const result = await blogCollection.insertOne(blog);
+      res.send(result);
+    })
+
+    app.patch('/blogs/:id', async(req,res)=>{
+      const id = req.params.id;
+      const updatedBlog = req.body;
+      const filter = {_id : new ObjectId(id)};
+      const updatedDoc = {
+          $set:{
+              status : updatedBlog.status,
+          }
+      }
+      const result = await blogCollection.updateOne(filter,updatedDoc);
+      res.send(result);
+  })
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
